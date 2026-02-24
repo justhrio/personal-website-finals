@@ -111,7 +111,7 @@
     </main>
 
     <footer class="site-footer">
-      <p>© 2026 Designer &bull; Contact: bpananayo@student.apc.edu.ph</p>
+      <p>© 2026 Designer &bull; Contact: xsrevelar@student.apc.edu.ph</p>
       <p>Debug and Structure &bull; Reference: AI</p>
     </footer>
 
