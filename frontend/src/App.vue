@@ -1,6 +1,22 @@
 <template>
   <div class="app-container">
     
+    <div class="falling-notes-container">
+      <span 
+        v-for="note in notes" 
+        :key="note.id" 
+        class="music-note"
+        :style="{ 
+          left: note.left, 
+          animationDuration: note.duration, 
+          animationDelay: note.delay, 
+          fontSize: note.fontSize 
+        }"
+      >
+        {{ note.symbol }}
+      </span>
+    </div>
+
     <nav class="navbar glass-panel">
       <div class="logo">XR.</div>
       <div class="nav-links">
@@ -98,7 +114,7 @@
         
         <div class="guitar-names-callout">
           <p>
-            🎸 Meet <strong>Margaret</strong> (my blue Cort M600)! But honestly... I still need help naming my purple Stratocaster. Got any ideas? Drop a suggestion in the guestbook below!
+            🎸 Meet <strong>Margaret</strong> (my blue Cort)! But honestly... I still need help naming my purple Stratocaster. Got any ideas? Drop a suggestion in the guestbook below!
           </p>
         </div>
         
@@ -193,9 +209,28 @@ const filteredProjects = computed(() => {
   return projects.value.filter(p => p.category === currentFilter.value);
 });
 
-// --- SCROLL REVEAL LOGIC ---
+// --- FALLING MUSIC NOTES LOGIC ---
+const notes = ref([]);
+const generateNotes = () => {
+  const noteSymbols = ['♪', '♫', '♬', '♩'];
+  const newNotes = [];
+  for (let i = 0; i < 25; i++) { // Generates 25 notes at a time
+    newNotes.push({
+      id: i,
+      symbol: noteSymbols[Math.floor(Math.random() * noteSymbols.length)],
+      left: `${Math.random() * 100}vw`,
+      duration: `${Math.random() * 10 + 8}s`, // Falls for 8 to 18 seconds
+      delay: `${Math.random() * 5}s`,         // Staggers the start times
+      fontSize: `${Math.random() * 1.5 + 1}rem` // Randomizes the size
+    });
+  }
+  notes.value = newNotes;
+};
+
+// --- ON MOUNTED (SCROLL REVEAL + NOTES + API) ---
 onMounted(() => {
   fetchComments();
+  generateNotes(); // Start the rain!
   
   const observer = new IntersectionObserver((entries) => {
     entries.forEach(entry => {
@@ -245,10 +280,49 @@ h1, h2, h3, .logo {
   letter-spacing: -0.5px; 
 }
 
+/* Ensure container sits above the falling notes */
 .app-container {
   max-width: 1100px;
   margin: 0 auto;
   padding: 2rem;
+  position: relative;
+  z-index: 1; 
+}
+
+/* --- FALLING MUSIC NOTES CSS --- */
+.falling-notes-container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  pointer-events: none; /* Allows you to click right through them */
+  z-index: -1; /* Puts them behind your glass cards */
+  overflow: hidden;
+}
+
+.music-note {
+  position: absolute;
+  top: -10vh;
+  color: rgba(56, 189, 248, 0.15); /* Faint accent color so it isn't distracting */
+  animation: fall linear infinite;
+}
+
+@keyframes fall {
+  0% {
+    transform: translateY(0) rotate(0deg);
+    opacity: 0;
+  }
+  10% {
+    opacity: 1;
+  }
+  90% {
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(110vh) rotate(360deg);
+    opacity: 0;
+  }
 }
 
 /* --- NAVBAR --- */
