@@ -43,16 +43,16 @@
         </p>
 
         <div class="social-icons">
-          <a href="#" target="_blank" class="icon-circle" title="LinkedIn">
+          <a href="https://www.linkedin.com/in/xander-revelar-40141a326/" target="_blank" class="icon-circle" title="LinkedIn">
             <i class="fa-brands fa-linkedin-in"></i>
           </a>
-          <a href="#" target="_blank" class="icon-circle" title="GitHub">
+          <a href="https://github.com/justhrio" target="_blank" class="icon-circle" title="GitHub">
             <i class="fa-brands fa-github"></i>
           </a>
-          <a href="#" target="_blank" class="icon-circle" title="Facebook">
+          <a href="https://www.facebook.com/xander.revelar.8" target="_blank" class="icon-circle" title="Facebook">
             <i class="fa-brands fa-facebook-f"></i>
           </a>
-          <a href="#" target="_blank" class="icon-circle" title="Instagram">
+          <a href="https://www.instagram.com/xndrrrrrr/" target="_blank" class="icon-circle" title="Instagram">
             <i class="fa-brands fa-instagram"></i>
           </a>
         </div>
