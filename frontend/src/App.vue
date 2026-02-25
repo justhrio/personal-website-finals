@@ -160,7 +160,7 @@
 import { ref, computed, onMounted } from 'vue';
 
 // --- API & GUESTBOOK LOGIC ---
-const API_URL = 'https://YOUR-CODESPACE-URL-3000.app.github.dev/api/guestbook'; // REMEMBER TO UPDATE THIS TO YOUR PORT 3000 URL!
+const API_URL = 'https://grpleufvicotavmmlzaa.supabase.co'; // REMEMBER TO UPDATE THIS TO YOUR PORT 3000 URL!
 
 const comments = ref([]);
 const newName = ref('');
