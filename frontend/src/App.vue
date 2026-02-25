@@ -170,7 +170,14 @@ const isSubmitting = ref(false);
 const fetchComments = async () => {
   try {
     const response = await fetch(API_URL);
-    comments.value = await response.json();
+    const data = await response.json();
+    
+    // SAFETY CHECK: Only set the comments if the data is actually an array!
+    if (Array.isArray(data)) {
+      comments.value = data;
+    } else {
+      console.error("Backend returned an error instead of an array:", data);
+    }
   } catch (error) {
     console.error('Error fetching comments:', error);
   }
