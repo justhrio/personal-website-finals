@@ -96,6 +96,12 @@
           Some shots of my gear. Always working on dialing in those presets on the DigiTech RP360XP and chasing that perfect Kurt Cobain tone.
         </p>
         
+        <div class="guitar-names-callout">
+          <p>
+            🎸 Meet <strong>Margaret</strong> (my blue Cort M600)! But honestly... I still need help naming my purple Stratocaster. Got any ideas? Drop a suggestion in the guestbook below!
+          </p>
+        </div>
+        
         <div class="gallery-grid">
           <img src="https://drive.google.com/thumbnail?id=1FVpYQ_bQ0y3603nB4Bf4lBerm7V5MB2A&sz=w1000" alt="Guitar 1" class="gallery-img" />
           <img src="https://drive.google.com/thumbnail?id=1tPJnejmQGbiYxyMo4-pwCz5f52FhIF5f&sz=w1000" alt="Guitar 2" class="gallery-img" />
@@ -139,7 +145,7 @@
 import { ref, computed, onMounted } from 'vue';
 
 // --- API & GUESTBOOK LOGIC ---
-const API_URL = 'https://YOUR-CODESPACE-URL-3000.app.github.dev/api/guestbook'; // UPDATE THIS TO YOUR PORT 3000 URL!
+const API_URL = 'https://YOUR-CODESPACE-URL-3000.app.github.dev/api/guestbook'; // REMEMBER TO UPDATE THIS TO YOUR PORT 3000 URL!
 
 const comments = ref([]);
 const newName = ref('');
@@ -403,12 +409,29 @@ h1, h2, h3, .logo {
   margin-bottom: 2rem;
 }
 
-/* --- GALLERY SECTION --- */
+/* --- GALLERY SECTION & CALLOUT --- */
+.guitar-names-callout {
+  background: rgba(56, 189, 248, 0.1);
+  border-left: 4px solid var(--accent);
+  padding: 1rem 1.5rem;
+  margin-bottom: 2rem;
+  border-radius: 0 8px 8px 0;
+}
+.guitar-names-callout p {
+  margin: 0;
+  color: var(--text-primary);
+  font-weight: 300;
+  font-size: 0.95rem;
+}
+.guitar-names-callout strong {
+  color: var(--accent);
+  font-weight: 600;
+}
+
 .gallery-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
   gap: 1.5rem;
-  margin-top: 1.5rem;
 }
 .gallery-img {
   width: 100%;
