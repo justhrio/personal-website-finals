@@ -7,6 +7,7 @@
         <a href="#">Home</a>
         <a href="#about">About</a>
         <a href="#portfolio">Portfolio</a>
+        <a href="#gallery">Gallery</a>
         <a href="#guestbook">Guestbook</a>
       </div>
     </nav>
@@ -17,7 +18,8 @@
         <h1>Xander Revelar</h1>
         
         <div class="typing-wrapper">
-          <h2>I am a <span class="typing-text accent-text">Cyber Security Student</span></h2>
+          <h2>I am a</h2>
+          <h2 class="typing-text accent-text">Cyber Security Student</h2>
         </div>
         
         <p class="bio-text">
@@ -25,16 +27,16 @@
         </p>
 
         <div class="social-icons">
-          <a href="https://www.linkedin.com/in/xander-revelar-40141a326/" target="_blank" class="icon-circle" title="LinkedIn">
+          <a href="#" target="_blank" class="icon-circle" title="LinkedIn">
             <i class="fa-brands fa-linkedin-in"></i>
           </a>
-          <a href="https://github.com/justhrio" target="_blank" class="icon-circle" title="GitHub">
+          <a href="#" target="_blank" class="icon-circle" title="GitHub">
             <i class="fa-brands fa-github"></i>
           </a>
-          <a href="https://www.facebook.com/xander.revelar.8/" target="_blank" class="icon-circle" title="Facebook">
+          <a href="#" target="_blank" class="icon-circle" title="Facebook">
             <i class="fa-brands fa-facebook-f"></i>
           </a>
-          <a href="https://www.instagram.com/" target="_blank" class="icon-circle" title="Instagram">
+          <a href="#" target="_blank" class="icon-circle" title="Instagram">
             <i class="fa-brands fa-instagram"></i>
           </a>
         </div>
@@ -88,6 +90,20 @@
         </div>
       </section>
 
+      <section id="gallery" class="glass-panel reveal">
+        <h2>Guitar Gallery</h2>
+        <p class="bio-text">
+          Some shots of my gear. Always working on dialing in those presets on the DigiTech RP360XP and chasing that perfect Kurt Cobain tone.
+        </p>
+        
+        <div class="gallery-grid">
+          <img src="https://drive.google.com/thumbnail?id=1FVpYQ_bQ0y3603nB4Bf4lBerm7V5MB2A&sz=w1000" alt="Guitar 1" class="gallery-img" />
+          <img src="https://drive.google.com/thumbnail?id=1tPJnejmQGbiYxyMo4-pwCz5f52FhIF5f&sz=w1000" alt="Guitar 2" class="gallery-img" />
+          <img src="https://drive.google.com/thumbnail?id=1B4nvuOuGE-xEf4jq7oFLu_wKpj0T15hg&sz=w1000" alt="Guitar 3" class="gallery-img" />
+          <img src="https://drive.google.com/thumbnail?id=17vpgipzd6iZaT4Mk-zkxICqlkX2c01if&sz=w1000" alt="Guitar 4" class="gallery-img" />
+        </div>
+      </section>
+
       <section id="guestbook" class="guestbook-section glass-panel reveal">
         <h2>Guestbook</h2>
         
@@ -111,8 +127,9 @@
     </main>
 
     <footer class="site-footer">
-      <p>© 2026 Designer &bull; Contact: xsrevelar@student.apc.edu.ph</p>
+      <p>© 2026 Designer &bull; Contact: bpananayo@student.apc.edu.ph</p>
       <p>Debug and Structure &bull; Reference: AI</p>
+      <p>Inspiration &bull; M Akkira</p>
     </footer>
 
   </div>
@@ -122,7 +139,7 @@
 import { ref, computed, onMounted } from 'vue';
 
 // --- API & GUESTBOOK LOGIC ---
-const API_URL = 'https://YOUR-CODESPACE-URL-3000.app.github.dev/api/guestbook'; // UPDATE THIS TO YOUR CODESPACE PORT 3000 URL!
+const API_URL = 'https://YOUR-CODESPACE-URL-3000.app.github.dev/api/guestbook'; // UPDATE THIS TO YOUR PORT 3000 URL!
 
 const comments = ref([]);
 const newName = ref('');
@@ -189,7 +206,6 @@ onMounted(() => {
 </script>
 
 <style>
-/* Import the bold, modern Poppins font */
 @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;800&display=swap');
 
 /* --- BASE VARIABLES --- */
@@ -242,10 +258,13 @@ h1, h2, h3, .logo {
   font-size: 1.5rem;
   color: var(--accent);
 }
+.nav-links {
+  display: flex;
+  gap: 1.5rem;
+}
 .nav-links a {
   color: var(--text-primary);
   text-decoration: none;
-  margin-left: 1.5rem;
   font-weight: 600;
   font-size: 0.9rem;
   transition: color 0.3s;
@@ -283,11 +302,22 @@ h1, h2, h3, .logo {
   line-height: 1.1;
   color: white;
 }
+
+/* --- TYPING WRAPPER FIX --- */
+.typing-wrapper {
+  display: flex;
+  align-items: baseline;
+  flex-wrap: nowrap; 
+  white-space: nowrap;
+  gap: 0.5rem; 
+  margin-bottom: 1rem;
+}
 .hero-content h2 {
   font-size: 1.8rem;
-  margin-bottom: 1rem;
+  margin-bottom: 0; 
   font-weight: 600; 
 }
+
 .bio-text {
   color: var(--text-muted);
   max-width: 450px;
@@ -296,17 +326,13 @@ h1, h2, h3, .logo {
 }
 
 /* Typing Effect */
-.typing-wrapper {
-  display: inline-block;
-}
 .typing-text {
   overflow: hidden;
   white-space: nowrap;
   border-right: 3px solid var(--accent);
   color: var(--accent);
   animation: typing 3s steps(40, end), blink-caret 0.75s step-end infinite;
-  display: inline-block;
-  vertical-align: bottom;
+  padding-right: 4px;
 }
 @keyframes typing { from { width: 0; } to { width: 100%; } }
 @keyframes blink-caret { from, to { border-color: transparent; } 50% { border-color: var(--accent); } }
@@ -377,6 +403,27 @@ h1, h2, h3, .logo {
   margin-bottom: 2rem;
 }
 
+/* --- GALLERY SECTION --- */
+.gallery-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1.5rem;
+  margin-top: 1.5rem;
+}
+.gallery-img {
+  width: 100%;
+  height: 250px;
+  object-fit: cover;
+  border-radius: 12px;
+  border: 1px solid var(--glass-border);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+.gallery-img:hover {
+  transform: translateY(-5px) scale(1.02);
+  box-shadow: 0 10px 20px rgba(0,0,0,0.3), 0 0 15px var(--accent-glow);
+}
+
+/* --- PORTFOLIO GRID --- */
 .portfolio-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
@@ -476,7 +523,7 @@ input:focus, textarea:focus { outline: none; border-color: var(--accent); }
   .social-icons { justify-content: center; }
   .bio-text { margin: 0 auto 2rem auto; }
   .navbar { flex-direction: column; gap: 1rem; }
-  .nav-links { display: flex; flex-wrap: wrap; justify-content: center; }
+  .nav-links { display: flex; flex-wrap: wrap; justify-content: center; gap: 0.5rem; }
   .nav-links a { margin: 0.5rem; }
 }
 </style>
