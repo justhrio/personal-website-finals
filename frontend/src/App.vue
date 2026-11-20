@@ -127,23 +127,70 @@
       </section>
 
       <section id="guestbook" class="guestbook-section glass-panel reveal">
-        <h2>Guestbook</h2>
+        <div class="guestbook-header">
+          <h2>Guestbook</h2>
+          <div class="guestbook-mode-controls">
+            <span v-if="useLocalTestMode" class="mode-badge test-mode">
+              Local Test Mode (Browser Storage)
+            </span>
+            <button
+              type="button"
+              class="mode-toggle-btn"
+              @click="toggleTestMode"
+            >
+              {{ useLocalTestMode ? 'Switch to Live API' : 'Enable Test Mode' }}
+            </button>
+          </div>
+        </div>
         
         <form @submit.prevent="submitComment" class="comment-form">
-          <input v-model="newName" type="text" placeholder="Your Name" required />
-          <textarea v-model="newMessage" placeholder="Leave a message..." required></textarea>
+          <input
+            v-model="newName"
+            type="text"
+            maxlength="80"
+            placeholder="Your Name"
+            required
+          />
+          <textarea
+            v-model="newMessage"
+            maxlength="1000"
+            rows="3"
+            placeholder="Leave a message..."
+            required
+          ></textarea>
           <button type="submit" :disabled="isSubmitting" class="submit-btn">
             {{ isSubmitting ? 'Sending...' : 'Sign Guestbook' }}
           </button>
         </form>
 
+        <div v-if="guestbookError" class="status-banner error-banner">
+          <span>{{ guestbookError }}</span>
+          <button
+            v-if="!useLocalTestMode"
+            type="button"
+            class="inline-action-btn"
+            @click="enableTestMode"
+          >
+            Test Locally Instead
+          </button>
+        </div>
+
+        <div v-if="submitSuccess" class="status-banner success-banner">
+          {{ submitSuccess }}
+        </div>
+
         <div class="comments-list">
-          <div v-for="comment in comments" :key="comment.id" class="comment-item">
-            <strong>{{ comment.name }}</strong>
-            <p>{{ comment.message }}</p>
-            <small>{{ new Date(comment.created_at).toLocaleDateString() }}</small>
-          </div>
-          <p v-if="comments.length === 0" class="empty-state">No comments yet. Be the first!</p>
+          <p v-if="isLoadingComments" class="empty-state">Loading comments...</p>
+          <template v-else>
+            <div v-for="comment in comments" :key="comment.id" class="comment-item">
+              <strong>{{ comment.name }}</strong>
+              <p>{{ comment.message }}</p>
+              <small>{{ formatDate(comment.created_at) }}</small>
+            </div>
+            <p v-if="comments.length === 0" class="empty-state">
+              No comments yet. Be the first!
+            </p>
+          </template>
         </div>
       </section>
     </main>
@@ -160,46 +207,155 @@
 import { ref, computed, onMounted } from 'vue';
 
 // --- API & GUESTBOOK LOGIC ---
-const API_URL = 'https://xander-portfolio-backend.onrender.com/api/guestbook'; // REMEMBER TO UPDATE THIS TO YOUR PORT 3000 URL!
+const API_URL =
+  import.meta.env.VITE_API_URL ||
+  'https://xander-portfolio-backend.onrender.com/api/guestbook';
+const TEST_MODE_STORAGE_KEY = 'guestbook_test_mode';
+const TEST_COMMENTS_STORAGE_KEY = 'guestbook_test_comments';
 
 const comments = ref([]);
 const newName = ref('');
 const newMessage = ref('');
 const isSubmitting = ref(false);
+const isLoadingComments = ref(false);
+const guestbookError = ref('');
+const submitSuccess = ref('');
+const useLocalTestMode = ref(
+  localStorage.getItem(TEST_MODE_STORAGE_KEY) === 'true',
+);
+
+const formatDate = (isoString) => {
+  if (!isoString) return '';
+  const date = new Date(isoString);
+  return Number.isNaN(date.getTime()) ? '' : date.toLocaleDateString();
+};
+
+const readLocalComments = () => {
+  try {
+    const raw = localStorage.getItem(TEST_COMMENTS_STORAGE_KEY);
+    const parsed = raw ? JSON.parse(raw) : [];
+    return Array.isArray(parsed) ? parsed : [];
+  } catch {
+    return [];
+  }
+};
+
+const writeLocalComments = (entries) => {
+  localStorage.setItem(TEST_COMMENTS_STORAGE_KEY, JSON.stringify(entries));
+};
 
 const fetchComments = async () => {
+  guestbookError.value = '';
+  if (useLocalTestMode.value) {
+    comments.value = readLocalComments();
+    return;
+  }
+
+  isLoadingComments.value = true;
   try {
     const response = await fetch(API_URL);
-    const data = await response.json();
-    
-    // SAFETY CHECK: Only set the comments if the data is actually an array!
+    const data = await response.json().catch(() => null);
+
+    if (!response.ok) {
+      const msg =
+        (data && data.message) ||
+        `Backend returned HTTP ${response.status}. Check Supabase connection.`;
+      throw new Error(Array.isArray(msg) ? msg.join(', ') : msg);
+    }
+
     if (Array.isArray(data)) {
       comments.value = data;
     } else {
-      console.error("Backend returned an error instead of an array:", data);
+      throw new Error('Unexpected response format from guestbook API.');
     }
   } catch (error) {
     console.error('Error fetching comments:', error);
+    guestbookError.value =
+      error instanceof Error
+        ? error.message
+        : 'Unable to load guestbook comments.';
+  } finally {
+    isLoadingComments.value = false;
   }
 };
 
 const submitComment = async () => {
-  if (!newName.value || !newMessage.value) return;
+  const name = newName.value.trim();
+  const message = newMessage.value.trim();
+
+  guestbookError.value = '';
+  submitSuccess.value = '';
+
+  if (!name || !message) {
+    guestbookError.value = 'Please enter both your name and a message.';
+    return;
+  }
+
   isSubmitting.value = true;
   try {
-    await fetch(API_URL, {
+    if (useLocalTestMode.value) {
+      const entry = {
+        id: `local-${Date.now()}`,
+        name,
+        message,
+        created_at: new Date().toISOString(),
+      };
+      const updated = [entry, ...readLocalComments()];
+      writeLocalComments(updated);
+      comments.value = updated;
+      newName.value = '';
+      newMessage.value = '';
+      submitSuccess.value = 'Saved to local browser storage (Test Mode).';
+      return;
+    }
+
+    const response = await fetch(API_URL, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ name: newName.value, message: newMessage.value })
+      body: JSON.stringify({ name, message }),
     });
+    const data = await response.json().catch(() => null);
+
+    if (!response.ok) {
+      const msg =
+        (data && data.message) ||
+        `Failed to save comment (HTTP ${response.status}).`;
+      throw new Error(Array.isArray(msg) ? msg.join(', ') : msg);
+    }
+
+    const created = Array.isArray(data) ? data[0] : data;
+    if (created && created.id !== undefined) {
+      comments.value = [created, ...comments.value];
+    } else {
+      await fetchComments();
+    }
+
     newName.value = '';
     newMessage.value = '';
-    await fetchComments();
+    submitSuccess.value = 'Thanks! Your comment has been saved.';
   } catch (error) {
     console.error('Error submitting comment:', error);
+    guestbookError.value =
+      error instanceof Error
+        ? error.message
+        : 'Unable to save your comment. Please try again.';
   } finally {
     isSubmitting.value = false;
   }
+};
+
+const enableTestMode = () => {
+  useLocalTestMode.value = true;
+  localStorage.setItem(TEST_MODE_STORAGE_KEY, 'true');
+  submitSuccess.value = '';
+  void fetchComments();
+};
+
+const toggleTestMode = () => {
+  useLocalTestMode.value = !useLocalTestMode.value;
+  localStorage.setItem(TEST_MODE_STORAGE_KEY, String(useLocalTestMode.value));
+  submitSuccess.value = '';
+  void fetchComments();
 };
 
 // --- PORTFOLIO FILTERING LOGIC ---
@@ -558,6 +714,7 @@ h1, h2, h3, .logo {
 }
 
 input, textarea {
+  box-sizing: border-box;
   width: 100%;
   padding: 1rem;
   margin-bottom: 1rem;
@@ -582,6 +739,72 @@ input:focus, textarea:focus { outline: none; border-color: var(--accent); }
   cursor: pointer;
 }
 .submit-btn:hover:not(:disabled) { box-shadow: 0 0 15px var(--accent-glow); }
+.submit-btn:disabled { opacity: 0.6; cursor: not-allowed; }
+
+.guestbook-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+}
+.guestbook-header h2 {
+  margin: 0;
+}
+.guestbook-mode-controls {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  flex-wrap: wrap;
+}
+.mode-badge {
+  font-size: 0.75rem;
+  font-weight: 600;
+  padding: 0.25rem 0.65rem;
+  border-radius: 999px;
+  background: rgba(56, 189, 248, 0.15);
+  color: var(--accent);
+  border: 1px solid rgba(56, 189, 248, 0.35);
+}
+.mode-toggle-btn, .inline-action-btn {
+  background: rgba(255, 255, 255, 0.08);
+  color: var(--text-primary);
+  border: 1px solid var(--glass-border);
+  padding: 0.35rem 0.8rem;
+  border-radius: 8px;
+  cursor: pointer;
+  font-family: 'Poppins', sans-serif;
+  font-size: 0.8rem;
+  font-weight: 600;
+  transition: background 0.2s, border-color 0.2s;
+}
+.mode-toggle-btn:hover, .inline-action-btn:hover {
+  background: rgba(56, 189, 248, 0.2);
+  border-color: var(--accent);
+}
+
+.status-banner {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  margin-top: 1rem;
+  padding: 0.85rem 1rem;
+  border-radius: 8px;
+  font-size: 0.9rem;
+}
+.error-banner {
+  background: rgba(239, 68, 68, 0.15);
+  border: 1px solid rgba(239, 68, 68, 0.4);
+  color: #fecaca;
+}
+.success-banner {
+  background: rgba(34, 197, 94, 0.15);
+  border: 1px solid rgba(34, 197, 94, 0.4);
+  color: #bbf7d0;
+}
 
 /* --- COMMENTS --- */
 .comment-item {
