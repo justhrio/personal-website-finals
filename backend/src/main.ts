@@ -1,6 +1,7 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 
+// Function group: loadLocalEnv — safely loads local .env variables when running outside production
 function loadLocalEnv(): void {
   const proc = process as NodeJS.Process & {
     loadEnvFile?: (path?: string) => void;
@@ -14,6 +15,7 @@ function loadLocalEnv(): void {
   }
 }
 
+// Function group: bootstrap — initializes NestJS app, enables CORS, and starts the HTTP server
 async function bootstrap() {
   loadLocalEnv();
   const app = await NestFactory.create(AppModule);

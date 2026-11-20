@@ -1,6 +1,7 @@
 <template>
   <div class="app-container">
     
+    <!-- Function group: generateNotes — renders randomized falling music notes background -->
     <div class="falling-notes-container">
       <span 
         v-for="note in notes" 
@@ -17,6 +18,7 @@
       </span>
     </div>
 
+    <!-- Function group: Navigation bar — site brand logo and anchor navigation links -->
     <nav class="navbar glass-panel">
       <div class="logo">XSR</div>
       <div class="nav-links">
@@ -28,6 +30,7 @@
       </div>
     </nav>
 
+    <!-- Function group: Hero section & IntersectionObserver (.reveal) — intro, typing title, socials, and profile photo -->
     <header class="hero-section reveal">
       <div class="hero-content">
         <h3 class="greeting">Hello, I'm</h3>
@@ -70,6 +73,7 @@
     </header>
 
     <main>
+      <!-- Function group: About section & IntersectionObserver (.reveal) — personal bio and dedication note -->
       <section id="about" class="glass-panel reveal">
         <h2>About Me</h2>
         <p>
@@ -82,6 +86,7 @@
         </p>
       </section>
 
+      <!-- Function group: filteredProjects & currentFilter — filterable focus area cards -->
       <section id="portfolio" class="glass-panel reveal">
         <h2>My Focus Areas</h2>
         
@@ -109,6 +114,7 @@
         </div>
       </section>
 
+      <!-- Function group: Guitar Gallery & IntersectionObserver (.reveal) — gear showcase and image grid -->
       <section id="gallery" class="glass-panel reveal">
         <h2>Guitar Gallery</h2>
         <p class="bio-text">
@@ -129,6 +135,7 @@
         </div>
       </section>
 
+      <!-- Function group: Guestbook (fetchComments, submitComment, toggleTestMode, formatDate) — form, status banners, and comments list -->
       <section id="guestbook" class="guestbook-section glass-panel reveal">
         <div class="guestbook-header">
           <h2>Guestbook</h2>
@@ -198,6 +205,7 @@
       </section>
     </main>
 
+    <!-- Function group: Site footer — copyright and contact details -->
     <footer class="site-footer">
       <p>© 2026 Designer &bull; Contact: xsrevelar@student.apc.edu.ph</p>
       <p>Debug and Structure &bull; Reference: AI</p>
@@ -210,12 +218,14 @@
 import { ref, computed, onMounted } from 'vue';
 
 // --- API & GUESTBOOK LOGIC ---
+// Function group: Guestbook API configuration — endpoint URL and localStorage keys
 const API_URL =
   import.meta.env.VITE_API_URL ||
   'https://xander-portfolio-backend.onrender.com/api/guestbook';
 const TEST_MODE_STORAGE_KEY = 'guestbook_test_mode';
 const TEST_COMMENTS_STORAGE_KEY = 'guestbook_test_comments';
 
+// Function group: Guestbook reactive state — holds comments, form inputs, status banners, and test-mode flag
 const comments = ref([]);
 const newName = ref('');
 const newMessage = ref('');
@@ -227,12 +237,14 @@ const useLocalTestMode = ref(
   localStorage.getItem(TEST_MODE_STORAGE_KEY) === 'true',
 );
 
+// Function group: formatDate — formats ISO timestamps for display in the guestbook list
 const formatDate = (isoString) => {
   if (!isoString) return '';
   const date = new Date(isoString);
   return Number.isNaN(date.getTime()) ? '' : date.toLocaleDateString();
 };
 
+// Function group: readLocalComments — loads Local Test Mode comments from browser localStorage
 const readLocalComments = () => {
   try {
     const raw = localStorage.getItem(TEST_COMMENTS_STORAGE_KEY);
@@ -243,10 +255,12 @@ const readLocalComments = () => {
   }
 };
 
+// Function group: writeLocalComments — persists Local Test Mode comments into browser localStorage
 const writeLocalComments = (entries) => {
   localStorage.setItem(TEST_COMMENTS_STORAGE_KEY, JSON.stringify(entries));
 };
 
+// Function group: fetchComments — loads comments from localStorage (test mode) or the NestJS/Supabase API
 const fetchComments = async () => {
   guestbookError.value = '';
   if (useLocalTestMode.value) {
@@ -254,6 +268,7 @@ const fetchComments = async () => {
     return;
   }
 
+  // Function group: fetchComments — executes GET /api/guestbook and validates the response array
   isLoadingComments.value = true;
   try {
     const response = await fetch(API_URL);
@@ -282,6 +297,7 @@ const fetchComments = async () => {
   }
 };
 
+// Function group: submitComment — trims and validates guestbook form inputs before saving
 const submitComment = async () => {
   const name = newName.value.trim();
   const message = newMessage.value.trim();
@@ -294,6 +310,7 @@ const submitComment = async () => {
     return;
   }
 
+  // Function group: submitComment — saves comment to localStorage (test mode) or POST /api/guestbook
   isSubmitting.value = true;
   try {
     if (useLocalTestMode.value) {
@@ -347,6 +364,7 @@ const submitComment = async () => {
   }
 };
 
+// Function group: enableTestMode — switches the guestbook into browser localStorage test mode
 const enableTestMode = () => {
   useLocalTestMode.value = true;
   localStorage.setItem(TEST_MODE_STORAGE_KEY, 'true');
@@ -354,6 +372,7 @@ const enableTestMode = () => {
   void fetchComments();
 };
 
+// Function group: toggleTestMode — toggles between Live API mode and Local Test Mode
 const toggleTestMode = () => {
   useLocalTestMode.value = !useLocalTestMode.value;
   localStorage.setItem(TEST_MODE_STORAGE_KEY, String(useLocalTestMode.value));
@@ -362,6 +381,7 @@ const toggleTestMode = () => {
 };
 
 // --- PORTFOLIO FILTERING LOGIC ---
+// Function group: filteredProjects — stores focus area cards and active category filter state
 const currentFilter = ref('All');
 const projects = ref([
   { id: 1, category: 'Security', title: 'Cyber Security', desc: 'Passionate about forensics, network analysis, vulnerability scanning, and web application testing.' },
@@ -369,12 +389,14 @@ const projects = ref([
   { id: 3, category: 'IoT', title: 'Hardware & IoT', desc: 'Working with Arduino, designing circuits, and programming microcontrollers.' }
 ]);
 
+// Function group: filteredProjects — computes portfolio cards matching currentFilter
 const filteredProjects = computed(() => {
   if (currentFilter.value === 'All') return projects.value;
   return projects.value.filter(p => p.category === currentFilter.value);
 });
 
 // --- FALLING MUSIC NOTES LOGIC ---
+// Function group: generateNotes — creates 25 randomized falling music note particles
 const notes = ref([]);
 const generateNotes = () => {
   const noteSymbols = ['♪', '♫', '♬', '♩'];
@@ -393,10 +415,12 @@ const generateNotes = () => {
 };
 
 // --- ON MOUNTED (SCROLL REVEAL + NOTES + API) ---
+// Function group: onMounted — triggers initial guestbook fetch, falling notes, and scroll reveal observer
 onMounted(() => {
   fetchComments();
   generateNotes(); // Start the rain!
   
+  // Function group: onMounted (IntersectionObserver) — adds .visible class when .reveal sections enter viewport
   const observer = new IntersectionObserver((entries) => {
     entries.forEach(entry => {
       if (entry.isIntersecting) {
@@ -744,6 +768,7 @@ input:focus, textarea:focus { outline: none; border-color: var(--accent); }
 .submit-btn:hover:not(:disabled) { box-shadow: 0 0 15px var(--accent-glow); }
 .submit-btn:disabled { opacity: 0.6; cursor: not-allowed; }
 
+/* --- GUESTBOOK HEADER & TEST MODE CONTROLS (toggleTestMode / enableTestMode) --- */
 .guestbook-header {
   display: flex;
   justify-content: space-between;
@@ -787,6 +812,7 @@ input:focus, textarea:focus { outline: none; border-color: var(--accent); }
   border-color: var(--accent);
 }
 
+/* --- GUESTBOOK STATUS BANNERS (fetchComments / submitComment feedback) --- */
 .status-banner {
   display: flex;
   justify-content: space-between;

@@ -8,6 +8,7 @@ import {
 } from '@nestjs/common';
 import { SupabaseService } from './supabase.service';
 
+// Function group: GuestbookEntry & validation constants — shared shape and query bounds for AppService
 export interface GuestbookEntry {
   id: number | string;
   name: string;
@@ -26,6 +27,7 @@ export class AppService {
 
   constructor(private readonly supabaseService: SupabaseService) {}
 
+  // Function group: AppService.getHealth — checks Supabase connectivity and returns service health payload
   async getHealth() {
     const supabase = await this.supabaseService.checkConnection();
     return {
@@ -35,6 +37,7 @@ export class AppService {
     };
   }
 
+  // Function group: AppService.getComments — clamps query limit and prepares Supabase client
   async getComments(limit = DEFAULT_LIMIT): Promise<GuestbookEntry[]> {
     const safeLimit = Math.min(
       Math.max(Number.isFinite(limit) ? Math.trunc(limit) : DEFAULT_LIMIT, 1),
@@ -43,6 +46,7 @@ export class AppService {
 
     const supabase = this.supabaseService.getClient();
 
+    // Function group: AppService.getComments — fetches newest guestbook entries and maps Supabase/network errors
     try {
       const { data, error } = await supabase
         .from('guestbook')
@@ -70,6 +74,7 @@ export class AppService {
     }
   }
 
+  // Function group: AppService.addComment — trims and validates visitor name and message inputs
   async addComment(name: string, message: string): Promise<GuestbookEntry> {
     const cleanName = typeof name === 'string' ? name.trim() : '';
     const cleanMessage = typeof message === 'string' ? message.trim() : '';
@@ -93,6 +98,7 @@ export class AppService {
 
     const supabase = this.supabaseService.getClient();
 
+    // Function group: AppService.addComment — inserts validated comment into Supabase and returns the created row
     try {
       const { data, error } = await supabase
         .from('guestbook')
