@@ -18,7 +18,7 @@
     </div>
 
     <nav class="navbar glass-panel">
-      <div class="logo">XR.</div>
+      <div class="logo">XSR</div>
       <div class="nav-links">
         <a href="#">Home</a>
         <a href="#about">About</a>
@@ -76,6 +76,9 @@
           I am a Computer Science student specializing in Cyber Security and Forensics. 
           When I'm not studying or coding, my hobbies include playing the guitar, 
           recording song covers, and preaching.
+        </p>
+        <p>
+          Breneth is the most loveble person I've meant
         </p>
       </section>
 
@@ -257,9 +260,9 @@ onMounted(() => {
 
 /* --- BASE VARIABLES --- */
 :root {
-  --bg-color: #0f172a;
-  --glass-bg: rgba(30, 41, 59, 0.4); 
-  --glass-border: rgba(255, 255, 255, 0.08);
+  --bg-color: #1b102d;
+  --glass-bg: rgba(44, 24, 72, 0.45); 
+  --glass-border: rgba(255, 255, 255, 0.1);
   --text-primary: #f8fafc;
   --text-muted: #94a3b8;
   --accent: #38bdf8;
@@ -271,8 +274,8 @@ body {
   font-family: 'Poppins', sans-serif;
   background-color: var(--bg-color);
   background-image: 
-    radial-gradient(circle at 15% 20%, rgba(56, 189, 248, 0.12) 0%, transparent 40%),
-    radial-gradient(circle at 85% 60%, rgba(168, 85, 247, 0.12) 0%, transparent 40%);
+    radial-gradient(circle at 15% 20%, rgba(168, 85, 247, 0.28) 0%, transparent 45%),
+    radial-gradient(circle at 85% 60%, rgba(236, 72, 153, 0.2) 0%, transparent 45%);
   background-attachment: fixed;
   color: var(--text-primary);
   line-height: 1.6;
