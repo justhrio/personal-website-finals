@@ -18,7 +18,7 @@
     </div>
 
     <nav class="navbar glass-panel">
-      <div class="logo">XR.</div>
+      <div class="logo">XSR</div>
       <div class="nav-links">
         <a href="#">Home</a>
         <a href="#about">About</a>
@@ -76,6 +76,9 @@
           I am a Computer Science student specializing in Cyber Security and Forensics. 
           When I'm not studying or coding, my hobbies include playing the guitar, 
           recording song covers, and preaching.
+        </p>
+        <p>
+          Breneth is the most loveble person I've meant
         </p>
       </section>
 
